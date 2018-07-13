@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "admin"
+      MYSQL_USER: "dojo"
+      MYSQL_PASSWORD: "dojo"
+      MYSQL_DATABASE: "defectdojo"
+
+  defectdojo_one:
+    restart: always
+    build: .
+    ports:
+      - 8000:8000
+    environment:
+      AUTO_DOCKER: "yes"
+      SQLHOST: "db"
+      SQLPORT: "3306"
+      SQLUSER: "dojo"
+      SQLPWD: "dojo"
+      DBNAME: "defectdojo"
+      DOJO_ADMIN_USER: "john"
+      DOJO_ADMIN_PASSWORD: "john"
+      FLUSHDB: "N"
+    links:
+      - db
+    command: ["bash", "-c", "./wait-for-db.sh && ./setup.bash -y && bash docker/docker-startup.bash -y"]
+
+  defectdojo_two:
+    restart: always
+    build: .
+    ports:
+      - 8001:8000
+    environment:
+      AUTO_DOCKER: "yes"
+      SQLHOST: "db"
+      SQLPORT: "3306"
+      SQLUSER: "dojo"
+      SQLPWD: "dojo"
+      DBNAME: "defectdojo"
+      DOJO_ADMIN_USER: "john"
+      DOJO_ADMIN_PASSWORD: "john"
+      FLUSHDB: "N"
+    links:
+      - db
+      - defectdojo_one
+    command: ["bash", "-c", "./wait-for-defectdojo.sh && ./setup.bash -y && bash docker/docker-startup.bash -y"]
