@@ -22,7 +22,7 @@ services:
     restart: always
     build: .
     ports:
-      - 8000:8000
+      - "8000:8000"
     volumes:
       - django-DefectDojo:/opt/django-DefectDojo
     environment:
