@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     wkhtmltopdf \
     unzip \
-    build-essential
+    build-essential && apt-get clean
 
 ENV VERSION="461c13affda9d1e1001a55f502379cdb45e6f3d7"
 
@@ -52,17 +52,12 @@ ENV AUTO_DOCKER="yes"
 ENV DOCKER_DIR="/opt/django-DefectDojo/docker"
 ENV DOJO_ROOT_DIR="/opt/django-DefectDojo"
 ENV DJANGO_SETTINGS_MODULE="dojo.settings.settings"
+ENV RUN_TIERED="True"
+ENV FLUSHDB="N"
 
 RUN sudo pip install --upgrade virtualenv
 RUN virtualenv venv
 
-CMD ["bash", "-c", "export DBNAME=$MYSQL_DATABASE && \
-    export SQLUSER=$MYSQL_USER && \
-    export SQLPWD=$MYSQL_PASSWORD && \
-    export SQLHOST=$MYSQL_HOST && \
-    export SQLPORT=$MYSQL_PORT && \
-    export DOJO_MYSQL_HOST=$MYSQL_HOST && \
-    export DOJO_MYSQL_PORT=$MYSQL_PORT && \
-    bash setup.bash -y && \
-    cp dojo/settings/settings.py dojo/settings.py && \
-    bash docker/docker-startup.bash"]
+COPY ./setup.sh ./
+
+CMD ["bash", "setup.sh"]
