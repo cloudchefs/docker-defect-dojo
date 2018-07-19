@@ -1,51 +1,60 @@
-version: '3'
-
+version: '3.3'
 services:
-
-  db:
-    image: mysql:5.7
+  nginx:
     restart: always
+    image: aweaver/defectdojo-nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    expose:
+      - "80"
+      - "443"
     environment:
-      MYSQL_ROOT_PASSWORD: "admin"
-      MYSQL_USER: "dojo"
-      MYSQL_PASSWORD: "dojo"
-      MYSQL_DATABASE: "defectdojo"
-
-  defectdojo_one:
+     - DH_SIZE=512
+    volumes:
+      - django-DefectDojo:/django-DefectDojo
+      - nginxdata:/etc/nginx/external/
+    depends_on:
+      - dojo
+    links:
+      - dojo
+  dojo:
     restart: always
     build: .
     ports:
       - 8000:8000
+    volumes:
+      - django-DefectDojo:/opt/django-DefectDojo
     environment:
-      AUTO_DOCKER: "yes"
-      SQLHOST: "db"
-      SQLPORT: "3306"
-      SQLUSER: "dojo"
-      SQLPWD: "dojo"
-      DBNAME: "defectdojo"
-      DOJO_ADMIN_USER: "john"
-      DOJO_ADMIN_PASSWORD: "john"
-      FLUSHDB: "N"
-    links:
-      - db
-    command: ["bash", "-c", "./wait-for-db.sh && ./setup.bash -y && bash docker/docker-startup.bash -y"]
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=dojo
+      - MYSQL_USER=dojo
+      - MYSQL_PASSWORD=test123123sdasdasd221ds
 
-  defectdojo_two:
+      - DOJO_ADMIN_USER=admin
+      - DOJO_ADMIN_NAME=Admin-User
+      - DOJO_ADMIN_EMAIL=admin@dojo.local
+      - DOJO_ADMIN_PASSWORD=asdijoiwjoi2joeijrASDs21
+
+      - RUN_TIERED=True
+      - FLUSHDB=N
+  mysql:
     restart: always
-    build: .
+    image: mysql:5.7
     ports:
-      - 8001:8000
+      - "3306"
     environment:
-      AUTO_DOCKER: "yes"
-      SQLHOST: "db"
-      SQLPORT: "3306"
-      SQLUSER: "dojo"
-      SQLPWD: "dojo"
-      DBNAME: "defectdojo"
-      DOJO_ADMIN_USER: "john"
-      DOJO_ADMIN_PASSWORD: "john"
-      FLUSHDB: "N"
-    links:
-      - db
-      - defectdojo_one
-    command: ["bash", "-c", "./wait-for-defectdojo.sh && ./setup.bash -y && bash docker/docker-startup.bash -y"]
+      - DOJO_MYSQL_HOST=mysql
+      - DOJO_MYSQL_PORT=3306
+      - MYSQL_DATABASE=dojo
+      - MYSQL_USER=dojo
+      - MYSQL_PASSWORD=test123123sdasdasd221ds
+      - MYSQL_ROOT_PASSWORD=test123123sdasdasd221dsasdasd2dasd
+      - max_allowed_packet=16M
+    volumes:
+      - mysqldata:/var/lib/mysqldata/data/
+volumes:
+  mysqldata: {}
+  django-DefectDojo: {}
+  nginxdata: {}

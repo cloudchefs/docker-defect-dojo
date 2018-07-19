@@ -1,31 +1,68 @@
 FROM ubuntu:latest
 
-RUN apt-get update
-RUN apt-get install -y expect netcat
-RUN apt-get install -y wget mysql-server sudo
-RUN apt-get install -y gcc libssl-dev python-dev libmysqlclient-dev python-pip mysql-server git nodejs npm
+ENV TZ="Europe/Amsterdam"
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN wget https://github.com/DefectDojo/django-DefectDojo/archive/1.3.0.tar.gz
+RUN apt-get update && apt-get install -y \
+    expect \
+    netcat \
+    wget \
+    mysql-server \
+    sudo \
+    gcc \
+    libssl-dev \
+    python-dev \
+    libmysqlclient-dev \
+    python-pip \
+    mysql-server \
+    git \
+    nodejs \
+    npm \
+    apt-transport-https \
+    libjpeg-dev \
+    wkhtmltopdf \
+    unzip \
+    build-essential
 
-RUN tar -zxvf 1.3.0.tar.gz
-RUN mv django-DefectDojo-1.3.0 /opt/django-DefectDojo
+ENV VERSION="461c13affda9d1e1001a55f502379cdb45e6f3d7"
 
-ADD wait-for-db.sh wait-for-defectdojo.sh /opt/django-DefectDojo/
-RUN chmod +x /opt/django-DefectDojo/wait-for-defectdojo.sh
-RUN chmod +x /opt/django-DefectDojo/wait-for-db.sh
+RUN wget https://github.com/abelmokadem/django-DefectDojo/archive/$VERSION.zip
 
-RUN groupadd -g 999 dojo && \
-    useradd -r -u 999 -g dojo dojo && \
-    echo "dojo ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/dojo && \
-    chmod 0440 /etc/sudoers.d/dojo
-
-RUN chown -R dojo:dojo /opt/django-DefectDojo
-
-USER dojo:dojo
+RUN unzip $VERSION.zip
+RUN mv django-DefectDojo-$VERSION /opt/django-DefectDojo
 
 WORKDIR /opt/django-DefectDojo
 
-RUN chmod +x docker/docker-startup.bash
-RUN chmod +x docker/dojo-data.bash
+RUN sudo apt-get install -y curl apt-transport-https
+#Yarn
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+#Node
+RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash
 
-CMD ["bash", "-c", "./setup.bash -y && bash docker/docker-startup.bash -y"]
+RUN adduser --disabled-password --gecos "DefectDojo" dojo
+RUN cp docker/etc/dojo_sudo /etc/sudoers.d/dojo
+RUN chmod 0440 /etc/sudoers.d/dojo
+
+RUN chown -R dojo:dojo /opt/django-DefectDojo /home/dojo
+USER dojo:dojo
+
+ENV DBTYPE="1"
+ENV AUTO_DOCKER="yes"
+ENV DOCKER_DIR="/opt/django-DefectDojo/docker"
+ENV DOJO_ROOT_DIR="/opt/django-DefectDojo"
+ENV DJANGO_SETTINGS_MODULE="dojo.settings.settings"
+
+RUN sudo pip install --upgrade virtualenv
+RUN virtualenv venv
+
+CMD ["bash", "-c", "export DBNAME=$MYSQL_DATABASE && \
+    export SQLUSER=$MYSQL_USER && \
+    export SQLPWD=$MYSQL_PASSWORD && \
+    export SQLHOST=$MYSQL_HOST && \
+    export SQLPORT=$MYSQL_PORT && \
+    export DOJO_MYSQL_HOST=$MYSQL_HOST && \
+    export DOJO_MYSQL_PORT=$MYSQL_PORT && \
+    bash setup.bash -y && \
+    cp dojo/settings/settings.py dojo/settings.py && \
+    bash docker/docker-startup.bash"]
