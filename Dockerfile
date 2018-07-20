@@ -58,7 +58,7 @@ ENV FLUSHDB="N"
 RUN sudo pip install --upgrade virtualenv
 RUN virtualenv venv
 
-RUN echo $'#!/usr/bin/env bash \n\
+RUN echo '#!/usr/bin/env bash \n\
 \n\
 set -e \n\
 \n\
@@ -77,11 +77,14 @@ bash setup.bash -y \n\
 echo "*** Updating dojo/settings/settings.py" \n\
 sed -i "s/TEMPLATE_DEBUG = DEBUG/TEMPLATE_DEBUG = False/g" dojo/settings/settings.py \n\
 sed -i "s/DEBUG = True/DEBUG = False/g" dojo/settings/settings.py \n\
-sed -i "s/ALLOWED_HOSTS = \[]/ALLOWED_HOSTS = ['\''localhost'\'', '\''127.0.0.1'\'']/g" dojo/settings/settings.py \n\
+sed -i "s/ALLOWED_HOSTS = \[]/ALLOWED_HOSTS = [$ALLOWED_HOSTS]/g" dojo/settings/settings.py \n\
+\n\
+echo "*** Copy static files" \n\
+sudo cp -R /opt/django-DefectDojo/dojo/static /opt/defect-dojo-static \n\
 \n\
 echo "*** Running startup script" \n\
 bash docker/docker-startup.bash \n'\
-> script.sh
+> script.bash
 
-CMD ["bash", "script.sh"]
+CMD ["bash", "script.bash"]
 
