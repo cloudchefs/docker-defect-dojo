@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:18.04
 
 ENV TZ="Europe/Amsterdam"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -58,27 +58,30 @@ ENV FLUSHDB="N"
 RUN sudo pip install --upgrade virtualenv
 RUN virtualenv venv
 
-COPY ./setup.sh ./
+RUN echo $'#!/usr/bin/env bash \n\
+\n\
+set -e \n\
+\n\
+echo "*** Exporting environment variables" \n\
+export DBNAME=$MYSQL_DATABASE \n\
+export SQLUSER=$MYSQL_USER \n\
+export SQLPWD=$MYSQL_PASSWORD \n\
+export SQLHOST=$MYSQL_HOST \n\
+export SQLPORT=$MYSQL_PORT \n\
+export DOJO_MYSQL_HOST=$MYSQL_HOST \n\
+export DOJO_MYSQL_PORT=$MYSQL_PORT \n\
+\n\
+echo "*** Running setup script" \n\
+bash setup.bash -y \n\
+\n\
+echo "*** Updating dojo/settings/settings.py" \n\
+sed -i "s/TEMPLATE_DEBUG = DEBUG/TEMPLATE_DEBUG = False/g" dojo/settings/settings.py \n\
+sed -i "s/DEBUG = True/DEBUG = False/g" dojo/settings/settings.py \n\
+sed -i "s/ALLOWED_HOSTS = \[]/ALLOWED_HOSTS = ['\''localhost'\'', '\''127.0.0.1'\'']/g" dojo/settings/settings.py \n\
+\n\
+echo "*** Running startup script" \n\
+bash docker/docker-startup.bash \n'\
+> script.sh
 
-CMD ["bash", "-c", "\
-    echo \"*** Exporting environment variables\" && \
-    export DBNAME=$MYSQL_DATABASE && \
-    export SQLUSER=$MYSQL_USER && \
-    export SQLPWD=$MYSQL_PASSWORD && \
-    export SQLHOST=$MYSQL_HOST && \
-    export SQLPORT=$MYSQL_PORT && \
-    export DOJO_MYSQL_HOST=$MYSQL_HOST && \
-    export DOJO_MYSQL_PORT=$MYSQL_PORT && \
-    \
-    echo \"*** Running setup script\" && \
-    bash setup.bash -y && \
-    \
-    echo \"*** Updating dojo/settings/settings.py\" && \
-    sed -i \"s/TEMPLATE_DEBUG = DEBUG/TEMPLATE_DEBUG = False/g\" dojo/settings/settings.py && \
-    sed -i \"s/DEBUG = True/DEBUG = False/g\" dojo/settings/settings.py && \
-    sed -i \"s/ALLOWED_HOSTS = \[]/ALLOWED_HOSTS = ['localhost', '127.0.0.1']/g\" dojo/settings/settings.py && \
-    \
-    echo \"*** Running startup script\" && \
-    bash docker/docker-startup.bash \
-"]
+CMD ["bash", "script.sh"]
 

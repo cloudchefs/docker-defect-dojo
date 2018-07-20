@@ -20,7 +20,7 @@ services:
       - dojo
   dojo:
     restart: always
-    image: abelmokadem/defect-dojo:latest
+    build: .
     ports:
       - "8000:8000"
     volumes:
