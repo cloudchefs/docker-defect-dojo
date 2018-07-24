@@ -1,22 +1,18 @@
+map $http_x_forwarded_proto $real_scheme {
+  default $http_x_forwarded_proto;
+  ''      $scheme;
+}
+
 server {
-    listen 443;
+    listen 80;
     server_name localhost;
 
-    if ($proxy_x_forwarded_proto = "http") {
+    if ($real_scheme = "http") {
         return 301 https://$host$request_uri;
     }
 
     # Increase max upload
     client_max_body_size 500M;
-
-    ssl_certificate           /etc/nginx/external/cert.pem;
-    ssl_certificate_key       /etc/nginx/external/key.pem;
-
-    ssl on;
-    ssl_session_cache  builtin:1000  shared:SSL:10m;
-    ssl_protocols  TLSv1 TLSv1.1 TLSv1.2;
-    ssl_ciphers HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
-    ssl_prefer_server_ciphers on;
 
     access_log            /var/log/nginx/nginx.access.log;
 
