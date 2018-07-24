@@ -1,16 +1,10 @@
 server {
-    listen 80;
-
-    # Increase max upload
-    client_max_body_size 500M;
-
-    # Redirect http to https
-    return 301 https://$host$request_uri;
-}
-
-server {
     listen 443;
     server_name localhost;
+
+    if ($proxy_x_forwarded_proto = "http") {
+        return 301 https://$host$request_uri;
+    }
 
     # Increase max upload
     client_max_body_size 500M;
@@ -25,9 +19,6 @@ server {
     ssl_prefer_server_ciphers on;
 
     access_log            /var/log/nginx/nginx.access.log;
-
-    # Increase max upload
-    client_max_body_size 500M;
 
     #charset koi8-r;
     #access_log  /var/log/nginx/log/host.access.log  main;
