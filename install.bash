@@ -28,7 +28,7 @@ sed -i "s/DEBUG = True/DEBUG = False/g" dojo/settings/settings.py
 sed -i "s/ALLOWED_HOSTS = \[]/ALLOWED_HOSTS = [$ALLOWED_HOSTS, 'localhost', '$(awk 'END{print $1}' /etc/hosts)']/g" dojo/settings/settings.py
 
 echo "*** Tail nginx logs"
-tail -f /var/log/nginx/* &
+sudo tail -f /var/log/nginx/* &
 
 echo "*** Running startup script"
 bash docker/docker-startup.bash
