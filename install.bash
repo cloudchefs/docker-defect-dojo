@@ -2,6 +2,11 @@
 
 set -e
 
+#echo "*** Setting proxy"
+#touch ~/.npmrc
+#echo "proxy=$HTTP_PROXY" >> ~/.npmrc
+#echo "https-proxy=$HTTPS_PROXY" >> ~/.npmrc
+
 echo "*** Starting nginx"
 sudo service nginx start
 
@@ -24,6 +29,9 @@ sed -i "s/ALLOWED_HOSTS = \[]/ALLOWED_HOSTS = [$ALLOWED_HOSTS, 'localhost', '$(a
 
 echo "*** Copy static files"
 sudo cp -R /opt/django-DefectDojo/dojo/static /opt/defect-dojo-static
+
+echo "*** Tail nginx logs"
+tail -f /var/log/nginx/* &
 
 echo "*** Running startup script"
 bash docker/docker-startup.bash
