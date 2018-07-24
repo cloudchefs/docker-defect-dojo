@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
 
 ENV VERSION="461c13affda9d1e1001a55f502379cdb45e6f3d7"
 
+# Install nginx
 RUN wget https://github.com/abelmokadem/django-DefectDojo/archive/$VERSION.zip
 
 RUN unzip $VERSION.zip
@@ -44,6 +45,14 @@ RUN adduser --disabled-password --gecos "DefectDojo" dojo
 RUN cp docker/etc/dojo_sudo /etc/sudoers.d/dojo
 RUN chmod 0440 /etc/sudoers.d/dojo
 
+RUN openssl req -subj '/CN=localhost' -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -days 365
+RUN mkdir -p /etc/nginx/external && mv cert.pem key.pem /etc/nginx/external/
+
+RUN apt-get install -y nginx
+COPY ./nginx/default.nginx /etc/nginx/conf.d/default.conf
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+RUN nginx -t && service nginx restart
+
 RUN chown -R dojo:dojo /opt/django-DefectDojo /home/dojo
 USER dojo:dojo
 
@@ -58,33 +67,7 @@ ENV FLUSHDB="N"
 RUN sudo pip install --upgrade virtualenv
 RUN virtualenv venv
 
-RUN echo '#!/usr/bin/env bash \n\
-\n\
-set -e \n\
-\n\
-echo "*** Exporting environment variables" \n\
-export DBNAME=$MYSQL_DATABASE \n\
-export SQLUSER=$MYSQL_USER \n\
-export SQLPWD=$MYSQL_PASSWORD \n\
-export SQLHOST=$MYSQL_HOST \n\
-export SQLPORT=$MYSQL_PORT \n\
-export DOJO_MYSQL_HOST=$MYSQL_HOST \n\
-export DOJO_MYSQL_PORT=$MYSQL_PORT \n\
-\n\
-echo "*** Running setup script" \n\
-bash setup.bash -y \n\
-\n\
-echo "*** Updating dojo/settings/settings.py" \n\
-sed -i "s/TEMPLATE_DEBUG = DEBUG/TEMPLATE_DEBUG = False/g" dojo/settings/settings.py \n\
-sed -i "s/DEBUG = True/DEBUG = False/g" dojo/settings/settings.py \n\
-sed -i "s/ALLOWED_HOSTS = \[]/ALLOWED_HOSTS = [$ALLOWED_HOSTS]/g" dojo/settings/settings.py \n\
-\n\
-echo "*** Copy static files" \n\
-sudo cp -R /opt/django-DefectDojo/dojo/static /opt/defect-dojo-static \n\
-\n\
-echo "*** Running startup script" \n\
-bash docker/docker-startup.bash \n'\
-> script.bash
+COPY ./install.bash /opt/django-DefectDojo/install.bash
 
-CMD ["bash", "script.bash"]
+CMD ["bash", "install.bash"]
 
