@@ -45,9 +45,6 @@ RUN adduser --disabled-password --gecos "DefectDojo" dojo
 RUN cp docker/etc/dojo_sudo /etc/sudoers.d/dojo
 RUN chmod 0440 /etc/sudoers.d/dojo
 
-RUN openssl req -subj '/CN=localhost' -x509 -newkey rsa:4096 -nodes -keyout key.pem -out cert.pem -days 365
-RUN mkdir -p /etc/nginx/external && mv cert.pem key.pem /etc/nginx/external/
-
 RUN apt-get install -y nginx
 COPY ./nginx/default.nginx /etc/nginx/conf.d/default.conf
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf

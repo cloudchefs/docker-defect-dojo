@@ -5,10 +5,8 @@ services:
     build: .
     ports:
       - "80:80"
-      - "443:443"
     expose:
       - "80"
-      - "443"
     environment:
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
