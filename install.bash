@@ -3,9 +3,9 @@
 set -e
 
 #echo "*** Setting proxy"
-#touch ~/.npmrc
-#echo "proxy=$HTTP_PROXY" >> ~/.npmrc
-#echo "https-proxy=$HTTPS_PROXY" >> ~/.npmrc
+touch ~/.npmrc
+echo "proxy=$HTTP_PROXY" >> ~/.npmrc
+echo "https-proxy=$HTTPS_PROXY" >> ~/.npmrc
 
 echo "*** Starting nginx"
 sudo service nginx start
