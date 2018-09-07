@@ -1,13 +1,30 @@
 version: '3.3'
 services:
+  nginx:
+    restart: always
+#    image: aweaver/defectdojo-nginx:latest
+    build: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+     - DH_SIZE=512
+     - DOJO_HOST=dojo
+     - DOJO_PORT=8000
+    depends_on:
+      - dojo
+    links:
+      - dojo
+    volumes:
+      - type: volume
+        source: dojo_static
+        target: /opt/django-DefectDojo/static
+        read_only: true
   dojo:
     restart: always
     build: .
     ports:
-      - "80:80"
-      - "443:443"
-    expose:
-      - "443"
+      - "8000:8000"
     environment:
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
@@ -15,12 +32,10 @@ services:
       - MYSQL_USER=dojo
       - MYSQL_PASSWORD=test123123sdasdasd221ds
 
-      - DOJO_ADMIN_USER=admin
-      - DOJO_ADMIN_NAME=Admin-User
-      - DOJO_ADMIN_EMAIL=admin@dojo.local
-      - DOJO_ADMIN_PASSWORD=asdijoiwjoi2joeijrASDs21
-
-      - ALLOWED_HOSTS='localhost'
+      - ALLOWED_HOSTS='0.0.0.0'
+      - LOAD_SAMPLE_DATA=False
+    volumes:
+      - "dojo_static:/nginx"
   mysql:
     restart: always
     image: mysql:5.7
@@ -34,7 +49,5 @@ services:
       - MYSQL_PASSWORD=test123123sdasdasd221ds
       - MYSQL_ROOT_PASSWORD=test123123sdasdasd221dsasdasd2dasd
       - max_allowed_packet=16M
-    volumes:
-      - mysqldata:/var/lib/mysqldata/data/
 volumes:
-  mysqldata: {}
+  dojo_static: {}

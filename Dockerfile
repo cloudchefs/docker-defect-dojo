@@ -1,70 +1,67 @@
 FROM ubuntu:18.04
 
 ENV TZ="Europe/Amsterdam"
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
 
+# Install OS dependenices
 RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    unzip \
+    sudo \
     expect \
     netcat \
-    wget \
-    mysql-server \
-    sudo \
     gcc \
     libssl-dev \
     python-dev \
     libmysqlclient-dev \
     python-pip \
-    mysql-server \
     git \
     nodejs \
     npm \
+    apt-utils \
     apt-transport-https \
     libjpeg-dev \
     wkhtmltopdf \
-    unzip \
+    libmysqlclient-dev \
     build-essential && apt-get clean
 
-ENV VERSION="461c13affda9d1e1001a55f502379cdb45e6f3d7"
+# Install yarn and node
+ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE="DontWarn"
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -e && \
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - > /dev/null && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
+    apt-get update && apt-get install -y yarn && apt-get clean
 
-# Install nginx
-RUN wget https://github.com/abelmokadem/django-DefectDojo/archive/$VERSION.zip
+ENV VERSION="1.3.0"
 
+RUN wget https://github.com/DefectDojo/django-DefectDojo/archive/$VERSION.zip
 RUN unzip $VERSION.zip
 RUN mv django-DefectDojo-$VERSION /opt/django-DefectDojo
-
 WORKDIR /opt/django-DefectDojo
-
-RUN sudo apt-get install -y curl apt-transport-https
-#Yarn
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-#Node
-RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash
 
 RUN adduser --disabled-password --gecos "DefectDojo" dojo
 RUN cp docker/etc/dojo_sudo /etc/sudoers.d/dojo
 RUN chmod 0440 /etc/sudoers.d/dojo
 
-RUN apt-get install -y nginx
-COPY ./nginx/default.nginx /etc/nginx/conf.d/default.conf
-COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
-RUN nginx -t && service nginx restart
-
 RUN chown -R dojo:dojo /opt/django-DefectDojo /home/dojo
 USER dojo:dojo
 
-ENV DBTYPE="1"
-ENV AUTO_DOCKER="yes"
-ENV DOCKER_DIR="/opt/django-DefectDojo/docker"
-ENV DOJO_ROOT_DIR="/opt/django-DefectDojo"
-ENV DJANGO_SETTINGS_MODULE="dojo.settings.settings"
-ENV RUN_TIERED="True"
-ENV FLUSHDB="N"
+ENV DOCKER_DIR="/opt/django-DefectDojo/docker" \
+    DOJO_ROOT_DIR="/opt/django-DefectDojo" \
+    DJANGO_SETTINGS_MODULE="dojo.settings.settings"
 
-RUN sudo pip install --upgrade virtualenv
-RUN virtualenv venv
+RUN sudo pip install --upgrade pip && \
+    sudo -H pip install -U pip && \
+    sudo -H pip install .
 
-COPY ./install.bash /opt/django-DefectDojo/install.bash
+RUN cd components && yarn && cd ..
 
-CMD ["bash", "install.bash"]
+RUN sudo pip uninstall -y numpy && \
+    sudo apt-get install -y python-numpy
+
+COPY ./start.bash ./start.bash
+
+CMD ["bash", "start.bash"]
 
