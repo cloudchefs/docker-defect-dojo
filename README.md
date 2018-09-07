@@ -11,7 +11,7 @@ $ docker-compose up
 Once the containers are ready, you should have a docker container running against the "remote" database.
 
 ```bash
-localhost:8000 admin/admin
+https://localhost admin/admin
 ```
 
 ## Supported versions
