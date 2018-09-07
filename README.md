@@ -1,4 +1,4 @@
-# docker-defect-dojo
+# cloudchefs/docker-defect-dojo
 
 Run DefectDojo in a "stateless" fashion.
 
