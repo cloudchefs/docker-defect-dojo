@@ -2,7 +2,6 @@ version: '3.3'
 services:
   nginx:
     restart: always
-#    image: aweaver/defectdojo-nginx:latest
     build: ./nginx
     ports:
       - "80:80"
