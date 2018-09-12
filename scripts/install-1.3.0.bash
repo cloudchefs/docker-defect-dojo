@@ -1,7 +1,8 @@
 #!/bin/bash
 
 set -e
-set -x
+
+cd $DOJO_ROOT_DIR
 
 echo "*** Exporting environment variables"
 export DBNAME=$MYSQL_DATABASE
@@ -73,8 +74,6 @@ if [ "$LOAD_SAMPLE_DATA" = True ]; then
     echo "*** Loading sample data"
     bash $DOCKER_DIR/dojo-data.bash load
 fi
-
-cd $DOJO_ROOT_DIR
 
 gunicorn --env DJANGO_SETTINGS_MODULE=dojo.settings.settings dojo.wsgi:application --bind 0.0.0.0:$PORT --workers 3 & \
     celery -A dojo worker -l info --concurrency 3

@@ -61,7 +61,7 @@ RUN cd components && yarn && cd ..
 RUN sudo pip uninstall -y numpy && \
     sudo apt-get install -y python-numpy
 
-COPY ./start.bash ./start.bash
+COPY scripts ./cloudchefs-scripts
 
-CMD ["bash", "start.bash"]
+CMD ["bash", "./cloudchefs-scripts/install-1.3.0.bash"]
 
