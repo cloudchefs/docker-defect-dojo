@@ -19,7 +19,10 @@ services:
         read_only: true
   dojo:
     restart: always
-    build: .
+    build:
+      context: .
+      args:
+        VERSION: "${VERSION}"
     ports:
       - "8000:8000"
     environment:
@@ -32,7 +35,7 @@ services:
       - ALLOWED_HOSTS='0.0.0.0'
       - LOAD_SAMPLE_DATA=False
     volumes:
-      - "dojo_static:/nginx"
+      - "dojo_static:/opt/django-DefectDojo-static"
   mysql:
     restart: always
     image: mysql:5.7

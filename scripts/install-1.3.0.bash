@@ -66,9 +66,10 @@ python manage.py buildwatson
 
 python manage.py collectstatic --noinput
 
-sudo chown -R dojo:dojo /nginx
-echo "Copying static files to /nginx"
-sudo cp -R $PWD/static/* /nginx
+echo "Copying static files to /opt/django-DefectDojo-static/"
+mkdir -p /opt/django-DefectDojo-static/
+sudo chown -R dojo:dojo /opt/django-DefectDojo-static/
+sudo cp -R $PWD/static/ /opt/django-DefectDojo-static/
 
 if [ "$LOAD_SAMPLE_DATA" = True ]; then
     echo "*** Loading sample data"

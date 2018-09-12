@@ -1,5 +1,7 @@
 FROM ubuntu:18.04
 
+ARG VERSION
+
 ENV TZ="Europe/Amsterdam"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone
@@ -33,8 +35,6 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -e && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - > /dev/null && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install -y yarn && apt-get clean
-
-ENV VERSION="1.3.0"
 
 RUN wget https://github.com/DefectDojo/django-DefectDojo/archive/$VERSION.zip
 RUN unzip $VERSION.zip
