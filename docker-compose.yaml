@@ -2,14 +2,12 @@ version: '3.3'
 services:
   nginx:
     restart: always
-    build: ./nginx
+    image: aweaver/defectdojo-nginx:latest
     ports:
       - "80:80"
       - "443:443"
     environment:
      - DH_SIZE=512
-     - DOJO_HOST=dojo
-     - DOJO_PORT=8000
     depends_on:
       - dojo
     links:
@@ -17,7 +15,7 @@ services:
     volumes:
       - type: volume
         source: dojo_static
-        target: /opt/django-DefectDojo/static
+        target: /django-DefectDojo/static/
         read_only: true
   dojo:
     restart: always
