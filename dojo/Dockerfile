@@ -54,7 +54,7 @@ ENV DOCKER_DIR="/opt/django-DefectDojo/docker" \
 
 RUN sudo pip install --upgrade pip && \
     sudo -H pip install -U pip && \
-    sudo -H pip install .
+    sudo -H pip install -r requirements.txt
 
 RUN cd components && yarn && cd ..
 
@@ -62,6 +62,8 @@ RUN sudo pip uninstall -y numpy && \
     sudo apt-get install -y python-numpy
 
 COPY scripts ./cloudchefs-scripts
+RUN sudo chown -R dojo:dojo ./cloudchefs-scripts && \
+    chmod +x ./cloudchefs-scripts/install.bash
 
-CMD ["bash", "./cloudchefs-scripts/install-1.3.0.bash"]
+CMD ["bash", "./cloudchefs-scripts/install.bash"]
 

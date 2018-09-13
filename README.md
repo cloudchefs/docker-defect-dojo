@@ -15,3 +15,8 @@ https://localhost admin/admin
 
 ## Supported versions
 - 1.3.0
+
+## Development
+```bash
+VERSION="1.3.0" DOJO_HOST="dojo" docker-compose -f docker-compose.dev.yaml up --build
+```

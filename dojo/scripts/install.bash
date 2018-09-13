@@ -4,6 +4,8 @@ set -e
 
 cd $DOJO_ROOT_DIR
 
+sudo pip install celery==4.1.1
+
 echo "*** Exporting environment variables"
 export DBNAME=$MYSQL_DATABASE
 export SQLUSER=$MYSQL_USER
@@ -58,6 +60,7 @@ echo "*** Running migrations"
 python manage.py makemigrations dojo
 python manage.py makemigrations --merge --noinput
 python manage.py migrate
+
 python manage.py createsuperuser --noinput --username=admin --email='ed@example.com' || true
 docker/setup-superuser.expect
 
@@ -65,8 +68,14 @@ python manage.py loaddata product_type
 python manage.py loaddata test_type
 python manage.py loaddata development_environment
 python manage.py loaddata system_settings
+
 python manage.py installwatson
 python manage.py buildwatson
+
+if [ "$GENERATE_STATIC_FILES" = True ]; then
+    echo "*** Generating static files"
+    python manage.py collectstatic --noinput
+fi
 
 if [ "$LOAD_SAMPLE_DATA" = True ]; then
     echo "*** Loading sample data"
