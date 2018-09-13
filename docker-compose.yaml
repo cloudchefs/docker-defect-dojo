@@ -2,52 +2,41 @@ version: '3.3'
 services:
   nginx:
     restart: always
-    image: aweaver/defectdojo-nginx:latest
+    image: "cloudchefs/defect-dojo-nginx:${VERSION}"
     ports:
-      - "80:80"
-      - "443:443"
+    - "80:80"
+    - "443:443"
     environment:
-     - DH_SIZE=512
+    - DH_SIZE=512
     depends_on:
-      - dojo
+    - dojo
     links:
-      - dojo
-    volumes:
-      - type: volume
-        source: dojo_static
-        target: /django-DefectDojo/static/
-        read_only: true
+    - dojo
   dojo:
     restart: always
-    build:
-      context: .
-      args:
-        VERSION: "${VERSION}"
+    image: "cloudchefs/defect-dojo:${VERSION}"
     ports:
-      - "8000:8000"
+    - "8000:8000"
     environment:
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - MYSQL_DATABASE=dojo
-      - MYSQL_USER=dojo
-      - MYSQL_PASSWORD=test123123sdasdasd221ds
+    - MYSQL_HOST=mysql
+    - MYSQL_PORT=3306
+    - MYSQL_DATABASE=dojo
+    - MYSQL_USER=dojo
+    - MYSQL_PASSWORD=test123123sdasdasd221ds
 
-      - ALLOWED_HOSTS='0.0.0.0'
-      - LOAD_SAMPLE_DATA=False
-    volumes:
-      - "dojo_static:/opt/django-DefectDojo-static"
+    - ALLOWED_HOSTS='0.0.0.0'
+    - HOST=0.0.0.0
+    - LOAD_SAMPLE_DATA=False
   mysql:
     restart: always
     image: mysql:5.7
     ports:
-      - "3306"
+    - "3306"
     environment:
-      - DOJO_MYSQL_HOST=mysql
-      - DOJO_MYSQL_PORT=3306
-      - MYSQL_DATABASE=dojo
-      - MYSQL_USER=dojo
-      - MYSQL_PASSWORD=test123123sdasdasd221ds
-      - MYSQL_ROOT_PASSWORD=test123123sdasdasd221dsasdasd2dasd
-      - max_allowed_packet=16M
-volumes:
-  dojo_static: {}
+    - DOJO_MYSQL_HOST=mysql
+    - DOJO_MYSQL_PORT=3306
+    - MYSQL_DATABASE=dojo
+    - MYSQL_USER=dojo
+    - MYSQL_PASSWORD=test123123sdasdasd221ds
+    - MYSQL_ROOT_PASSWORD=test123123sdasdasd221dsasdasd2dasd
+    - max_allowed_packet=16M
