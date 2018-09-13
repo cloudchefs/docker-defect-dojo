@@ -46,8 +46,8 @@ sed -i  -e "s/MYSQLHOST/$SQLHOST/g" \
         -e "s/# SESSION_COOKIE_SECURE = True/SESSION_COOKIE_SECURE = True/g" \
         -e "s/# CSRF_COOKIE_SECURE = True/CSRF_COOKIE_SECURE = True/g" \
         -e "s/ # 'django.middleware.security.SecurityMiddleware',/ 'django.middleware.security.SecurityMiddleware',/g" \
-        -e "s#DOJO_MEDIA_ROOT#$PWD/media#g" \
-        -e "s#DOJO_STATIC_ROOT#$PWD/static#g" \
+        -e "s#DOJO_MEDIA_ROOT#$PWD/media/#g" \
+        -e "s#DOJO_STATIC_ROOT#$PWD/static/#g" \
         -e "s/BACKENDDB/django.db.backends.mysql/g" \
         -e "s/TEMPLATE_DEBUG = DEBUG/TEMPLATE_DEBUG = False/g" \
         -e "s/DEBUG = True/DEBUG = False/g" \
