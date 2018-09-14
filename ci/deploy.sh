@@ -2,6 +2,13 @@
 
 set -e
 
-docker push cloudchefs/defect-dojo:1.3.0
-docker push cloudchefs/defect-dojo-nginx:1.3.0
-docker push cloudchefs/defect-dojo-fargate-nginx:1.3.0
+versions=( "1.3.0" "1.5.2" )
+
+for version in "${versions[@]}"
+do
+    echo $version
+
+    docker push cloudchefs/defect-dojo:$version
+    docker push cloudchefs/defect-dojo-nginx:$version
+    docker push cloudchefs/defect-dojo-fargate-nginx:$version
+done

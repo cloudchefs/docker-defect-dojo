@@ -2,19 +2,26 @@
 
 set -e
 
-# Build defect dojo image
-docker build \
-    -t cloudchefs/defect-dojo:1.3.0 \
-    --build-arg VERSION="1.3.0" dojo
+versions=( "1.3.0" "1.5.2" )
 
-# Build nginx image
-docker build \
-    -t cloudchefs/defect-dojo-nginx:1.3.0 \
-    --build-arg DOJO_HOST="dojo" \
-    --build-arg VERSION="1.3.0" nginx
+for version in "${versions[@]}"
+do
+    echo $version
 
-# Build nginx image for fargate
-docker build \
-    -t cloudchefs/defect-dojo-fargate-nginx:1.3.0 \
-    --build-arg DOJO_HOST="localhost" \
-    --build-arg VERSION="1.3.0" nginx
+    echo Build defect dojo image
+    docker build \
+        -t cloudchefs/defect-dojo:$version \
+        --build-arg VERSION="$version" dojo
+
+    echo Build nginx image
+    docker build \
+        -t cloudchefs/defect-dojo-nginx:$version \
+        --build-arg DOJO_HOST="dojo" \
+        --build-arg VERSION="$version" nginx
+
+    echo Build nginx image for fargate
+    docker build \
+        -t cloudchefs/defect-dojo-fargate-nginx:$version \
+        --build-arg DOJO_HOST="localhost" \
+        --build-arg VERSION="$version" nginx
+done
