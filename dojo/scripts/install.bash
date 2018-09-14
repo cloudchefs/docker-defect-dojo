@@ -58,7 +58,7 @@ sed -i  -e "s/MYSQLHOST/$SQLHOST/g" \
 
 echo "*** Running migrations"
 python manage.py makemigrations dojo
-python manage.py makemigrations --merge --noinput
+python manage.py makemigrations
 python manage.py migrate
 
 python manage.py createsuperuser --noinput --username=admin --email='ed@example.com' || true
