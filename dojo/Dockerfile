@@ -7,7 +7,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone
 
 # Install OS dependenices
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y nodejs npm && apt-get install -y \
     wget \
     curl \
     unzip \
@@ -20,8 +20,6 @@ RUN apt-get update && apt-get install -y \
     libmysqlclient-dev \
     python-pip \
     git \
-    nodejs \
-    npm \
     apt-utils \
     apt-transport-https \
     libjpeg-dev \
