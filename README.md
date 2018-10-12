@@ -16,6 +16,7 @@ https://localhost admin/admin
 ## Supported versions
 - 1.3.0
 - 1.5.2
+- 1.5.3
 
 ## Caveats
 - Upgrading from `1.3.0` to `1.5.2` does NOT work!
