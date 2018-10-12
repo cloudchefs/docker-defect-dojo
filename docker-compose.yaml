@@ -2,7 +2,7 @@ version: '3.3'
 services:
   nginx:
     restart: always
-    image: "cloudchefs/defect-dojo-nginx:${VERSION}"
+    image: "cloudchefs/defect-dojo-nginx:${VERSION}-${RELEASE}"
     ports:
     - "80:80"
     - "443:443"
@@ -14,7 +14,7 @@ services:
     - dojo
   dojo:
     restart: always
-    image: "cloudchefs/defect-dojo:${VERSION}"
+    image: "cloudchefs/defect-dojo:${VERSION}-${RELEASE}"
     ports:
     - "8000:8000"
     environment:

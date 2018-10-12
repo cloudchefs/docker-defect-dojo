@@ -4,7 +4,7 @@ Run DefectDojo in a "stateless" fashion.
 
 ## Run with `docker-compose`
 ```bash
-$ VERSION="..." docker-compose up --build
+$ VERSION="..." RELEASE="..." docker-compose up --build
 ```
 
 Once the containers are ready, you should have a docker container running against the "remote" database.
