@@ -14,9 +14,11 @@ https://localhost admin/admin
 ```
 
 ## Supported versions
-- 1.3.0
-- 1.5.2
-- 1.5.3
+Versions in docker hub are tagged with the Defect Dojo version number and the docker release number.
+
+`${VERSION}-${RELEASE}`
+
+See [docker hub](https://hub.docker.com/r/cloudchefs/defect-dojo/tags/) for the supported versions.
 
 ## Caveats
 - Upgrading from `1.3.0` to `1.5.2` does NOT work!
