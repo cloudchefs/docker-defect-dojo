@@ -64,6 +64,8 @@ python manage.py migrate
 python manage.py createsuperuser --noinput --username=admin --email='ed@example.com' || true
 docker/setup-superuser.expect
 
+python manage.py loaddata system_settings
+
 python manage.py installwatson
 python manage.py buildwatson
 
