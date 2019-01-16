@@ -42,6 +42,7 @@ sed -i  -e "s/MYSQLHOST/$SQLHOST/g" \
         -e "s/MYSQLDB/$DBNAME/g" \
         -e "s#DOJODIR#$PWD/dojo#g" \
         -e "s/DOJOSECRET/$SECRET/g" \
+        -e "s/DATA_UPLOAD_MAX_MEMORY_SIZE = '20971520'/g" \
         -e "s/# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')/SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')/g" \
         -e "s/# SECURE_SSL_REDIRECT = True/SECURE_SSL_REDIRECT = True/g" \
         -e "s/# SECURE_BROWSER_XSS_FILTER = True/SECURE_BROWSER_XSS_FILTER = True/g" \
