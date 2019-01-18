@@ -42,7 +42,6 @@ sed -i  -e "s/MYSQLHOST/$SQLHOST/g" \
         -e "s/MYSQLDB/$DBNAME/g" \
         -e "s#DOJODIR#$PWD/dojo#g" \
         -e "s/DOJOSECRET/$SECRET/g" \
-        -e "s/DATA_UPLOAD_MAX_MEMORY_SIZE = '20971520'/g" \
         -e "s/# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')/SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')/g" \
         -e "s/# SECURE_SSL_REDIRECT = True/SECURE_SSL_REDIRECT = True/g" \
         -e "s/# SECURE_BROWSER_XSS_FILTER = True/SECURE_BROWSER_XSS_FILTER = True/g" \
@@ -56,6 +55,9 @@ sed -i  -e "s/MYSQLHOST/$SQLHOST/g" \
         -e "s/DEBUG = True/DEBUG = False/g" \
         -e "s/ALLOWED_HOSTS = \[]/ALLOWED_HOSTS = [$ALLOWED_HOSTS, 'localhost', '$(awk 'END{print $1}' /etc/hosts)']/g" \
         ${TARGET_SETTINGS_FILE}
+
+# Disables DATA_UPLOAD_MAX_MEMORY_SIZE in Django
+awk '/STATIC_URL/ { print; print "DATA_UPLOAD_MAX_MEMORY_SIZE = None"; next }1' ${TARGET_SETTINGS_FILE} > tmp && mv tmp ${TARGET_SETTINGS_FILE}        
 
 echo "*** Running migrations"
 python manage.py makemigrations dojo
