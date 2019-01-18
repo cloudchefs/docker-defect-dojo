@@ -56,6 +56,9 @@ sed -i  -e "s/MYSQLHOST/$SQLHOST/g" \
         -e "s/ALLOWED_HOSTS = \[]/ALLOWED_HOSTS = [$ALLOWED_HOSTS, 'localhost', '$(awk 'END{print $1}' /etc/hosts)']/g" \
         ${TARGET_SETTINGS_FILE}
 
+# Disables DATA_UPLOAD_MAX_MEMORY_SIZE in Django
+awk '/STATIC_URL/ { print; print "DATA_UPLOAD_MAX_MEMORY_SIZE = None"; next }1' ${TARGET_SETTINGS_FILE} > tmp && mv tmp ${TARGET_SETTINGS_FILE}
+
 echo "*** Running migrations"
 python manage.py makemigrations dojo
 python manage.py makemigrations
