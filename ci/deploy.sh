@@ -8,7 +8,7 @@ if [ -z "$1" ]; then
 fi
 
 release=$1
-versions=( "1.3.0" "1.5.2" "1.5.3" )
+versions=( "1.6.2")
 
 for version in "${versions[@]}"
 do

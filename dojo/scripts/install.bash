@@ -5,6 +5,7 @@ set -e
 cd $DOJO_ROOT_DIR
 
 sudo pip install celery==4.1.1
+sudo pip install django
 
 echo "*** Exporting environment variables"
 export DBNAME=$MYSQL_DATABASE

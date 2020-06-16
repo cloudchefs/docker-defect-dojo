@@ -28,3 +28,8 @@ See [docker hub](https://hub.docker.com/r/cloudchefs/defect-dojo/tags/) for the 
 VERSION="..." DOJO_HOST="dojo" docker-compose -f docker-compose.dev.yaml up --build
 
 ```
+
+## Push new version to Docker
+./ci/build.sh 1 (check releases and versions)
+./ci/deploy.sh 1 (check release and versions)
+
