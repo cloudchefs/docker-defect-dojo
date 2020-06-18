@@ -17,10 +17,17 @@ RUN apt-get update && apt-get install -y nodejs npm && apt-get install -y \
     netcat \
     gcc \
     libssl-dev \
-    python-dev \
+    python3.5 \
+    # python3-dev \
     libmysqlclient-dev \
+    # socat curl python3-software-properties \
     python-pip \
     python3-pip \
+    python3-setuptools \
+    python3-wheel \
+    python-virtualenv \
+    python3-venv \
+    mysql-server \
     git \
     apt-utils \
     apt-transport-https \
@@ -29,9 +36,20 @@ RUN apt-get update && apt-get install -y nodejs npm && apt-get install -y \
     libmysqlclient-dev \
     build-essential && apt-get clean
 
+# Install python 3.5
+# RUN wget https://www.python.org/ftp/python/3.5.6/Python-3.5.6.tgz 
+# RUN sudo tar -xzf Python-3.5.6.tgz 
+# RUN cd Python-3.5.6 \
+#     ls \
+#     sudo ./configure --enable-loadable-sqlite-extensions --enable-optimizations \
+#     sudo make \
+#     sudo make test \
+#     sudo make install \
+#     sudo ldconfig
+
 # Install yarn and node
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE="DontWarn"
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -e && \
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -e && \
     apt-get -y update && \
     apt-get -y install nodejs && \
     echo "$(node --version)" && \
@@ -58,15 +76,15 @@ ENV DOCKER_DIR="/opt/django-DefectDojo/docker" \
     DJANGO_SETTINGS_MODULE="dojo.settings.settings"
 
 # RUN sudo -H pip install --upgrade pip && \
-RUN sudo -H pip3 install -U pip && \
-    sudo -H pip3 install --upgrade pip && \
-    #sudo -H pip install asteval==0.9.18 && \
-    sudo -H pip3 install -r requirements.txt
+RUN python3 --version
+RUN python3 -m pip install --upgrade pip && \
+    sudo -H python3 -m pip install -U pip && \
+    sudo -H python3 -m pip install -r requirements.txt
 
 RUN cd components && yarn && cd ..
 
-RUN sudo pip3 uninstall -y numpy && \
-    sudo apt-get install -y python-numpy
+RUN sudo python3 -m pip uninstall -y numpy && \
+    sudo apt-get install -y python3-numpy
 
 COPY scripts ./cloudchefs-scripts
 RUN sudo chown -R dojo:dojo ./cloudchefs-scripts && \

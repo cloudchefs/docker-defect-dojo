@@ -4,8 +4,8 @@ set -e
 
 cd $DOJO_ROOT_DIR
 
-sudo pip install celery==4.1.1
-sudo pip install django
+sudo pip3 install celery
+# sudo pip3 install django
 
 echo "*** Exporting environment variables"
 export DBNAME=$MYSQL_DATABASE
@@ -29,6 +29,9 @@ bash $DOCKER_DIR/wait-for-it.sh $DOJO_MYSQL_HOST:$DOJO_MYSQL_PORT
 
 echo "*** Updating dojo/settings/settings.py"
 unset HISTFILE
+
+echo "***** python version"
+python3 --version
 
 SECRET=`cat /dev/urandom | LC_CTYPE=C tr -dc "a-zA-Z0-9" | head -c 128`
 TARGET_SETTINGS_FILE=dojo/settings/settings.py
@@ -61,21 +64,22 @@ sed -i  -e "s/MYSQLHOST/$SQLHOST/g" \
 awk '/STATIC_URL/ { print; print "DATA_UPLOAD_MAX_MEMORY_SIZE = None"; next }1' ${TARGET_SETTINGS_FILE} > tmp && mv tmp ${TARGET_SETTINGS_FILE}
 
 echo "*** Running migrations"
-python manage.py makemigrations dojo
-python manage.py makemigrations
-python manage.py migrate
+python3 manage.py makemigrations dojo DEBUG=TRUE
+python3 manage.py makemigrations --merge --noinput
+python3 manage.py migrate
 
-python manage.py createsuperuser --noinput --username=admin --email='ed@example.com' || true
+python3 manage.py createsuperuser --noinput --username=admin --email='ed@example.com' || true
 docker/setup-superuser.expect
 
-python manage.py loaddata system_settings
+python3 manage.py loaddata system_settings
 
-python manage.py installwatson
-python manage.py buildwatson
+python3 manage.py installwatson
+python3 manage.py buildwatson
 
 if [ "$GENERATE_STATIC_FILES" = True ]; then
     echo "*** Generating static files"
-    python manage.py collectstatic --noinput
+    cd $PWD/static/ 
+    python3 manage.py collectstatic --noinput
 fi
 
 if [ "$LOAD_SAMPLE_DATA" = True ]; then
