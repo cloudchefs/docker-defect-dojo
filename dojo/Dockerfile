@@ -17,7 +17,6 @@ RUN apt-get update && apt-get install -y nodejs npm && apt-get install -y \
     netcat \
     gcc \
     libssl-dev \
-    python3.5 \
     # python3-dev \
     libmysqlclient-dev \
     # socat curl python3-software-properties \
@@ -35,17 +34,6 @@ RUN apt-get update && apt-get install -y nodejs npm && apt-get install -y \
     wkhtmltopdf \
     libmysqlclient-dev \
     build-essential && apt-get clean
-
-# Install python 3.5
-# RUN wget https://www.python.org/ftp/python/3.5.6/Python-3.5.6.tgz 
-# RUN sudo tar -xzf Python-3.5.6.tgz 
-# RUN cd Python-3.5.6 \
-#     ls \
-#     sudo ./configure --enable-loadable-sqlite-extensions --enable-optimizations \
-#     sudo make \
-#     sudo make test \
-#     sudo make install \
-#     sudo ldconfig
 
 # Install yarn and node
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE="DontWarn"
@@ -77,9 +65,11 @@ ENV DOCKER_DIR="/opt/django-DefectDojo/docker" \
 
 # RUN sudo -H pip install --upgrade pip && \
 RUN python3 --version
+# RUN sed -i 's/pandas>=0.25/pandas>=0.24.2/g' requirements.txt 
+RUN echo cat requirements.txt
 RUN python3 -m pip install --upgrade pip && \
-    sudo -H python3 -m pip install -U pip && \
-    sudo -H python3 -m pip install -r requirements.txt
+    pip3 install -U pip && \
+    pip3 install -r requirements.txt
 
 RUN cd components && yarn && cd ..
 

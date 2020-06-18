@@ -53,18 +53,22 @@ sed -i  -e "s/MYSQLHOST/$SQLHOST/g" \
         -e "s/# CSRF_COOKIE_SECURE = True/CSRF_COOKIE_SECURE = True/g" \
         -e "s/ # 'django.middleware.security.SecurityMiddleware',/ 'django.middleware.security.SecurityMiddleware',/g" \
         -e "s#DOJO_MEDIA_ROOT#$PWD/media/#g" \
-        -e "s#DOJO_STATIC_ROOT#$PWD/static/#g" \
+        -e "'content'"
+        -e "s#DD_STATIC_ROOT#$PWD/static/#g" \
         -e "s/BACKENDDB/django.db.backends.mysql/g" \
         -e "s/TEMPLATE_DEBUG = DEBUG/TEMPLATE_DEBUG = False/g" \
-        -e "s/DEBUG = True/DEBUG = False/g" \
+        -e "s/DEBUG = True/DEBUG = True/g" \
         -e "s/ALLOWED_HOSTS = \[]/ALLOWED_HOSTS = [$ALLOWED_HOSTS, 'localhost', '$(awk 'END{print $1}' /etc/hosts)']/g" \
         ${TARGET_SETTINGS_FILE}
+
+# cat settings
+cat dojo/settings/settings.dist.py
 
 # Disables DATA_UPLOAD_MAX_MEMORY_SIZE in Django
 awk '/STATIC_URL/ { print; print "DATA_UPLOAD_MAX_MEMORY_SIZE = None"; next }1' ${TARGET_SETTINGS_FILE} > tmp && mv tmp ${TARGET_SETTINGS_FILE}
 
 echo "*** Running migrations"
-python3 manage.py makemigrations dojo DEBUG=TRUE
+python3 manage.py makemigrations dojo --no-input
 python3 manage.py makemigrations --merge --noinput
 python3 manage.py migrate
 
