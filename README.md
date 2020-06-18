@@ -33,3 +33,5 @@ VERSION="..." DOJO_HOST="dojo" docker-compose -f docker-compose.dev.yaml up --bu
 ./ci/build.sh 1 (check releases and versions)
 ./ci/deploy.sh 1 (check release and versions)
 
+## handy commands
+- docker-compose rm -v

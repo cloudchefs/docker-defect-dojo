@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y nodejs npm && apt-get install -y \
     netcat \
     gcc \
     libssl-dev \
+    gunicorn \
     # python3-dev \
     libmysqlclient-dev \
     # socat curl python3-software-properties \
@@ -78,7 +79,9 @@ RUN sudo python3 -m pip uninstall -y numpy && \
 
 COPY scripts ./cloudchefs-scripts
 RUN sudo chown -R dojo:dojo ./cloudchefs-scripts && \
-    chmod +x ./cloudchefs-scripts/install.bash
+    chmod +x ./cloudchefs-scripts/install.bash && \
+    chmod +x ./cloudchefs-scripts/config-vars.sh 
 
+CMD ["bash", "./cloudchefs-scripts/config-vars.sh"]
 CMD ["bash", "./cloudchefs-scripts/install.bash"]
 ENV DEBIAN_FRONTEND teletype
