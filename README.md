@@ -19,7 +19,6 @@ Versions in docker hub are tagged with the Defect Dojo version number and the do
 `${VERSION}-${RELEASE}`
 
 See [docker hub](https://hub.docker.com/r/cloudchefs/defect-dojo/tags/) for the supported versions.
-
 ## Caveats
 - Upgrading from `1.3.0` to `1.5.2` does NOT work!
 
@@ -32,6 +31,10 @@ VERSION="..." DOJO_HOST="dojo" docker-compose -f docker-compose.dev.yaml up --bu
 ## Push new version to Docker
 ./ci/build.sh 1 (check releases and versions)
 ./ci/deploy.sh 1 (check release and versions)
+
+## copy static files
+- go in to official docker container
+- copy static file, generate tar file and add to folder.
 
 ## handy commands
 - docker-compose rm -v

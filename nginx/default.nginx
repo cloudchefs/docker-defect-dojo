@@ -9,7 +9,7 @@ server {
 }
 
 server {
-    listen 443;
+    listen 443 ssl;
     server_name localhost
 
         # Increase max upload
@@ -23,6 +23,7 @@ server {
     ssl_protocols  TLSv1 TLSv1.1 TLSv1.2;
     ssl_ciphers HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
     ssl_prefer_server_ciphers on;
+    add_header Strict-Transport-Security "max-age=63072000" always;
 
     access_log            /var/log/nginx/nginx.access.log;
 

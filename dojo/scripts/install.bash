@@ -4,12 +4,6 @@ set -e
 
 cd $DOJO_ROOT_DIR
 
-python3 -m pip install celery
-export PATH="$HOME/dojo/.local/bin:$PATH"
-
-# sudo pip3 install gunicorn
-# python3 -m pip install django
-
 # echo "*** Exporting environment variables"
 export DBNAME=$MYSQL_DATABASE
 export SQLUSER=$MYSQL_USER
@@ -18,6 +12,20 @@ export SQLHOST=$MYSQL_HOST
 export SQLPORT=$MYSQL_PORT
 export DOJO_MYSQL_HOST=$MYSQL_HOST
 export DOJO_MYSQL_PORT=$MYSQL_PORT
+
+echo '*****************CELLERY*******'
+echo $DOJO_MYSQL_HOST
+echo $DOJO_MYSQL_PORT
+
+python3 -m pip install celery==4.4.2
+export PATH="$HOME/dojo/.local/bin:$PATH"
+
+# celery help
+# python3 -m pip install wheel
+
+
+# sudo pip3 install gunicorn
+# python3 -m pip install django
 
 if [ -z "$PORT" ]; then
     export PORT=8000
@@ -63,7 +71,7 @@ sed -i  -e "s/MYSQLHOST/$SQLHOST/g" \
         -e "s#DD_STATIC_ROOT#'$PWD/static/'#g" \
         -e "s/BACKENDDB/django.db.backends.mysql/g" \
         -e "s/TEMPLATE_DEBUG = DEBUG/TEMPLATE_DEBUG = False/g" \
-        -e "s/DEBUG = True/DEBUG = True/g" \
+        -e "s/DEBUG = True/DEBUG = False/g" \
         -e "s/ALLOWED_HOSTS = \[]/ALLOWED_HOSTS = [$ALLOWED_HOSTS, 'localhost', '$(awk 'END{print $1}' /etc/hosts)']/g" \
         ${TARGET_SETTINGS_FILE}
 
@@ -86,7 +94,6 @@ fi
 if [ -z "$DD_ADMIN_PASSWORD" ]; then
       DD_ADMIN_PASSWORD="admin"
   fi
-
 
 echo "*** Running migrations"
 # python3 manage.py showmigrations
@@ -115,12 +122,17 @@ if [ "$LOAD_SAMPLE_DATA" = True ]; then
     bash $DOCKER_DIR/dojo-data.bash load
 fi
 
-# python3 manage.py runserver 0.0.0.0.:$PORT & \
-#     celery -A dojo worker -l info --concurrency 3
-
 python3 -m pip install virtualenv
 python3 -m venv env
 source env/bin/activate
+python3 -m pip install -r ./requirements.txt
+python3 -m pip install django_celery_results==1.1.2
+python3 -m pip install celery==4.4.2
+python3 -m pip install setuptools --upgrade
+python3 -m pip install django
+python3 -m pip install wheel
+python3 -m pip install mysqlclient
+python3 manage.py runserver 0.0.0.0:$PORT & celery -A dojo worker -l info --concurrency 3
 
-gunicorn --env DJANGO_SETTINGS_MODULE=dojo.settings.settings dojo.wsgi:application --bind 0.0.0.0:$PORT --workers 3 & \
-    celery -A dojo worker -l info --concurrency 3
+# gunicorn --env DJANGO_SETTINGS_MODULE=dojo.settings.settings dojo.wsgi:application --bind 0.0.0.0:$PORT --workers 3 & \
+#     celery -A dojo worker -l info --concurrency 3

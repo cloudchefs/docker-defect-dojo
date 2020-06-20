@@ -33,8 +33,8 @@ services:
     ports:
     - "3306"
     environment:
-    - DOJO_MYSQL_HOST=mysql
-    - DOJO_MYSQL_PORT=3306
+    - MYSQL_HOST=mysql
+    - MYSQL_PORT=3306
     - MYSQL_DATABASE=dojo
     - MYSQL_USER=dojo
     - MYSQL_PASSWORD=test123123sdasdasd221ds

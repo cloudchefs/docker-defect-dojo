@@ -16,17 +16,20 @@ RUN apt-get update && apt-get install -y nodejs npm && apt-get install -y \
     expect \
     netcat \
     gcc \
+    libpq-dev \
     libssl-dev \
-    gunicorn \
-    # python3-dev \
+    # gunicorn3 \
+    python3-dev \
     libmysqlclient-dev \
     # socat curl python3-software-properties \
-    python-pip \
+    # python-pip \
     python3-pip \
     python3-setuptools \
     python3-wheel \
-    python-virtualenv \
+    # python-virtualenv \
     python3-venv \
+    rabbitmq-server \
+    python3-software-properties \
     mysql-server \
     git \
     apt-utils \
@@ -38,7 +41,7 @@ RUN apt-get update && apt-get install -y nodejs npm && apt-get install -y \
 
 # Install yarn and node
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE="DontWarn"
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -e && \
+RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash && \
     apt-get -y update && \
     apt-get -y install nodejs && \
     echo "$(node --version)" && \
@@ -67,15 +70,19 @@ ENV DOCKER_DIR="/opt/django-DefectDojo/docker" \
 # RUN sudo -H pip install --upgrade pip && \
 RUN python3 --version
 # RUN sed -i 's/pandas>=0.25/pandas>=0.24.2/g' requirements.txt 
-RUN echo cat requirements.txt
-RUN python3 -m pip install --upgrade pip && \
+# RUN echo cat requirements.txt
+RUN python3 -m pip install virtualenv 
+RUN python3 -m venv env 
+CMD ["bash", "source env/bin/activate"]
+RUN sudo -H python3 -m pip install --upgrade pip && \
     pip3 install -U pip && \
     pip3 install -r requirements.txt
+RUN sudo -H python3 -m pip install setuptools --upgrade    
 
 RUN cd components && yarn && cd ..
 
-RUN sudo python3 -m pip uninstall -y numpy && \
-    sudo apt-get install -y python3-numpy
+# RUN sudo python3 -m pip uninstall -y numpy && \
+#     sudo apt-get install -y python3-numpy
 
 COPY scripts ./cloudchefs-scripts
 RUN sudo chown -R dojo:dojo ./cloudchefs-scripts && \
